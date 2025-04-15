@@ -17,33 +17,30 @@ namespace TodoApiMvc.Controllers
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        // GET: api/tasks
+
+        //GET: api/tasks
+        //===== THIS WILL GET ALL TASKS IN MY DB =====
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllTasks()
         {
-            var tasks = await _context.Tasks
-            .AsNoTracking()
-                .OrderBy(t => t.Id)
-                .Select(t => new ToDoItemsDto
-                {
-                    Id = t.Id,
-                    Title = t.Title,
-                    IsCompleted = t.IsCompleted
-                })
-                .ToListAsync();
+            var tasks = await _context.Tasks.AsNoTracking().OrderBy(t => t.Id)
+            .Select(t => new ToDoItemsDto
+            {
+                Id = t.Id,
+                Title = t.Title,
+                IsCompleted = t.IsCompleted
+            }).ToListAsync();
+
             return Ok(tasks);
         }
 
+
         // GET: api/tasks/5
+        //===== THIS WILL GET A SPECIFIC TASK BY ID =====
         [HttpGet("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetTask(int id)
         {
-            var task = await _context.Tasks
-                .AsNoTracking()
-                .FirstOrDefaultAsync(t => t.Id == id);
+            var task = await _context.Tasks.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
 
             if (task == null)
                 return NotFound(new { error = $"Task with ID {id} not found" });
@@ -56,16 +53,15 @@ namespace TodoApiMvc.Controllers
             });
         }
 
+
         // POST: api/tasks
+        //===== THIS WILL POST A TASK  INTO MY DB=====
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateTask([FromBody] ToDoItemsCreateDto request)
         {
             try
             {
-                var task = new ToDoItems(request.Title, request.IsCompleted);
-                _context.Tasks.Add(task);
+                var task = new ToDoItems(request.Title, request.IsCompleted);_context.Tasks.Add(task);
                 await _context.SaveChangesAsync();
 
                 var response = new ToDoItemsDto
@@ -83,11 +79,10 @@ namespace TodoApiMvc.Controllers
             }
         }
 
+
         // PUT: api/tasks/5
+        //===== THIS WILL UPDATE A TASK BASED OFF OF ID =====
         [HttpPut("{id}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateTask(int id, [FromBody] ToDoItemsCreateDto request)
         {
             try
@@ -106,10 +101,10 @@ namespace TodoApiMvc.Controllers
             }
         }
 
-        // DELETE: api/tasks/5
+
+        // DELETE: api/tasks/5\
+        //===== THIS WILL DELETE A TASK FROM THE DB OFF ID =====
         [HttpDelete("{id}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteTask(int id)
         {
             var task = await _context.Tasks.FindAsync(id);
